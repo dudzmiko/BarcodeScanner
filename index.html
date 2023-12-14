@@ -1,42 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="style.css" />
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="barcode.js"></script>
-
-<script type="text/javascript">
-
-var sound = new Audio("barcode.wav");
-
-$(document).ready(function() {
-
-	barcode.config.start = 0.1;
-	barcode.config.end = 0.9;
-	barcode.config.video = '#barcodevideo';
-	barcode.config.canvas = '#barcodecanvas';
-	barcode.config.canvasg = '#barcodecanvasg';
-	barcode.setHandler(function(barcode) {
-		$('#result').html(barcode);
-	});
-	barcode.init();
-
-	$('#result').bind('DOMSubtreeModified', function(e) {
-		sound.play();	
-	});
-
-});
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <title>Barcode Scanner Demo</title>
 </head>
-<body>TEST
-<div id="barcode">
-	<video id="barcodevideo" autoplay></video>
-	<canvas id="barcodecanvasg" ></canvas>
-</div>
-<canvas id="barcodecanvas" ></canvas>
-<div id="result"></div>
-
+<body>
+    <div id="reader" width="600px"></div>
 </body>
+<script>
+function onScanSuccess(decodedText, decodedResult) {
+  // handle the scanned code as you like, for example:
+  console.log(`Code matched = ${decodedText}`, decodedResult);
+}
+
+function onScanFailure(error) {
+  // handle scan failure, usually better to ignore and keep scanning.
+  // for example:
+  console.warn(`Code scan error = ${error}`);
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+  "reader",
+  { fps: 10, qrbox: {width: 250, height: 250} },
+  /* verbose= */ false);
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
 </html>
