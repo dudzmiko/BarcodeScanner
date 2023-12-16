@@ -81,9 +81,6 @@
       <div class="bounding-box"></div>
     </div>
     <div id="resultContainer">Zeskanowany kod: brak</div>
-    <div id="buttonContainer">
-      <button id="scanButton" onclick="scanAgain()">Skanuj ponownie</button>
-    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
@@ -118,6 +115,10 @@
 
       console.log("Zeskanowano kod kreskowy: " + code);
 
+      // Odtwórz dźwięk
+      var audio = new Audio("barcode.wav");
+      audio.play();
+
       // Dodaj ramkę wokół znalezionego kodu
       var boundingBoxDiv = document.querySelector(".bounding-box");
       boundingBoxDiv.style.left = boundingBox[0] + "px";
@@ -130,18 +131,6 @@
       resultContainer.innerText = "Zeskanowany kod: " + code;
       resultContainer.classList.add("found");
     });
-
-    // Funkcja do ponownego skanowania po kliknięciu przycisku
-    function scanAgain() {
-      console.log("Rozpoczęto ponowne skanowanie.");
-      
-      // Ukryj wynik z poprzedniego skanowania
-      var resultContainer = document.querySelector("#resultContainer");
-      resultContainer.classList.remove("found");
-      resultContainer.innerText = "Zeskanowany kod: brak";
-
-      Quagga.start();
-    }
   </script>
 </body>
 </html>
