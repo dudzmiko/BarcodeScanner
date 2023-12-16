@@ -1,30 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <title>Barcode Scanner Demo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quagga.js Barcode Scanner</title>
+  <style>
+    #interactive.viewport {
+      position: relative;
+    }
+
+    #interactive.viewport > *,
+    #buttonContainer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    canvas.drawing,
+    canvas.photo {
+      width: 100%;
+      height: 100%;
+    }
+
+    .bounding-box {
+      position: absolute;
+      box-sizing: border-box;
+      border: 2px solid red;
+      pointer-events: none;
+    }
+
+    #resultContainer {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      display: none;
+    }
+
+    #buttonContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #scanButton {
+      padding: 10px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div id="reader" width="600px"></div>
+  <div id="interactive" class="viewport">
+    <div class="bounding-box"></div>
+  </div>
+  <div id="resultContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+  <script>
+    // Inicjalizacja Quagga.js
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector("#interactive"),
+        constraints: {
+          facingMode: "environment",
+      
+        },
+      },
+      decoder: {
+        readers: ["ean_reader"]
+      }
+    }, function (err) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      Quagga.start();
+    });
+
+    // Obsługa zdarzenia skanowania
+    Quagga.onDetected(function (result) {
+      var code = result.codeResult.code;
+      var boundingBox = result.box;
+
+      console.log("Zeskanowano kod kreskowy: " + code);
+      Quagga.stop();
+
+      // Dodaj ramkę wokół znalezionego kodu
+      var boundingBoxDiv = document.querySelector(".bounding-box");
+      boundingBoxDiv.style.left = boundingBox[0] + "px";
+      boundingBoxDiv.style.top = boundingBox[1] + "px";
+      boundingBoxDiv.style.width = boundingBox[2] + "px";
+      boundingBoxDiv.style.height = boundingBox[3] + "px";
+
+      // Wyświetl zeskanowany kod pod kamerą
+      var resultContainer = document.querySelector("#resultContainer");
+      resultContainer.innerText = "Zeskanowany kod: " + code;
+      resultContainer.style.display = "block";
+    });
+  </script>
 </body>
-<script>
-function onScanSuccess(decodedText, decodedResult) {
-  // handle the scanned code as you like, for example:
-  console.log(`Code matched = ${decodedText}`, decodedResult);
-}
-
-function onScanFailure(error) {
-  // handle scan failure, usually better to ignore and keep scanning.
-  // for example:
-  console.warn(`Code scan error = ${error}`);
-}
-
-let html5QrcodeScanner = new Html5QrcodeScanner(
-  "reader",
-  { fps: 10, qrbox: {width: 250, height: 250} },
-  /* verbose= */ false);
-html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-</script>
 </html>
